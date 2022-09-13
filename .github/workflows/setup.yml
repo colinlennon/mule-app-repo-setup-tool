@@ -48,7 +48,8 @@ jobs:
           cd template
           ARTIFACT_ID_LINE_NUM=$(grep -n "<!-- PLACEHOLDER: project.artifactId -->" pom.xml | cut -d : -f 1)
           echo "ARTIFACT_ID_LINE_NUM: $ARTIFACT_ID_LINE_NUM"
-          let "ARTIFACT_ID_LINE_NUM=GROUP_ID_LINE_NUM+1"
-          sed -i "${ARTIFACT_ID_LINE_NUM}s|<artifactId>.*</artifactId>|<artifactId>colin-test</artifactId>|" pom.xml
+          let "ARTIFACT_ID_LINE_NUM=ARTIFACT_ID_LINE_NUM+1"
+          echo "ARTIFACT_ID_LINE_NUM: $ARTIFACT_ID_LINE_NUM"
+          sed -i "${ARTIFACT_ID_LINE_NUM}s|<artifactId>.*</artifactId>|<artifactId>${{ github.event.inputs.artifact-id }}</artifactId>|" pom.xml
           cat pom.xml
           
