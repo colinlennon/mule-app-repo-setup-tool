@@ -42,13 +42,10 @@ jobs:
           token: ${{ github.event.inputs.github-pat }}
           path: template
         
-      # Runs a single command using the runners shell
-      - name: Switch to template directory
-        run: cd template
-
-      - name: Replace project.artifactId
+      - name: Update pom.xml
         run: |
           cd template
+          echo "Replacing project.artifactId..."
           ARTIFACT_ID=${{ github.event.inputs.raml-asset-id }}-impl
           echo "ARTIFACT_ID: $ARTIFACT_ID"          
           ARTIFACT_ID_LINE_NUM=$(grep -n "<!-- PLACEHOLDER: project.artifactId -->" pom.xml | cut -d : -f 1) # TODO put placeholders in the template
@@ -56,18 +53,13 @@ jobs:
           sed -i "${ARTIFACT_ID_LINE_NUM}s|<artifactId>.*</artifactId>|<artifactId>${ARTIFACT_ID}</artifactId>|" pom.xml
           sed -i '/<!-- PLACEHOLDER: project.artifactId -->/d' pom.xml
           
-      - name: Replace project.version
-        run: |
-          cd template
+          echo "Replacing project.version..."
           VERSION_LINE_NUM=$(grep -n "<!-- PLACEHOLDER: project.version -->" pom.xml | cut -d : -f 1)
           let "VERSION_LINE_NUM=VERSION_LINE_NUM+1"
           sed -i "${VERSION_LINE_NUM}s|<version>.*</version>|<version>0.0.1</version>|" pom.xml
           sed -i '/<!-- PLACEHOLDER: project.version -->/d' pom.xml
-          cat pom.xml    # remove
-          
-      - name: Remove rest-api-template-spec dependency from pom.xml
-        run: |
-          cd template
+
+          echo "Removing rest-api-template-spec dependency..."
           API_GROUP_ID=4662d833-1567-4253-b115-eb71a03c7051
           # TODO: get API_GROUP_ID dynamically using line below. Maven settings need to be configured for this to work.
           #API_GROUP_ID=$(mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.groupId -q -DforceStdout)
@@ -76,9 +68,7 @@ jobs:
           REST_API_TEMPLATE_DEPENDECY_END="${REST_API_TEMPLATE_DEPENDECY_END}d"
           RES=$(sed -i "$REST_API_TEMPLATE_DEPENDECY_START,$REST_API_TEMPLATE_DEPENDECY_END" pom.xml)
           
-      - name: Add API spec dependency to pom.xml
-        run: |
-          cd template
+          echo "Adding API spec dependency..."
           API_GROUP_ID=4662d833-1567-4253-b115-eb71a03c7051 # TODO get dynamically
           API_ARTIFACT_ID=${{ github.event.inputs.raml-asset-id }}
           API_VERSION=${{ github.event.inputs.raml-version }}
@@ -91,4 +81,27 @@ jobs:
           API_SPEC_DEPENDENCY+=$"                </dependency>"
           sed -i "s,<\!-- PLACEHOLDER: api-spec dependency -->,$API_SPEC_DEPENDENCY," pom.xml # TODO add placeholder to pom.xml
           cat pom.xml       # remove
+          
+      - name: Update api.xml
+        run: |
+          API_ARTIFACT_ID=${{ github.event.inputs.raml-asset-id }}
+          RES=$(sed -i "s+name=\"api-httpListenerConfig\"+name=\"$API_ARTIFACT_ID-httpListenerConfig\"+" src/main/mule/api.xml)
+          RES=$(sed -i "s+<apikit:config name=\"api-config\"+<apikit:config name=\"$API_ARTIFACT_ID-config\"+" src/main/mule/api.xml)
+          #	- Search for and replace: api="resource::9603fc66-9985-4754-8a84-6dfcfc3b2d72:rest-api-template-spec:1.0.1:raml:zip:api.raml" (note: will need to update this for Bayer template)
+          RES=$(sed -i "s+api=\"resource::4662d833-1567-4253-b115-eb71a03c7051:rest-api-template-spec:1.0.0:raml:zip:api.raml\"+api=\"resource::$API_GROUP_ID:$API_ARTIFACT_ID:$API_VERSION:raml:zip:$API_ARTIFACT_ID.raml\"+" src/main/mule/api.xml)
+          RES=$(sed -i "s+<http:listener config-ref=\"api-httpListenerConfig\"+<http:listener config-ref=\"$API_ARTIFACT_ID-httpListenerConfig\"+" src/main/mule/api.xml)
+          RES=$(sed -i "s+<apikit:router config-ref=\"api-config\"+<apikit:router config-ref=\"$API_ARTIFACT_ID-config\"+" src/main/mule/api.xml)
+          RES=$(sed -i "s+<flow name=\"api-main\">+<flow name=\"$API_ARTIFACT_ID-main\">+" src/main/mule/api.xml)
+          RES=$(sed -i "s+<flow name=\"get:\\\ping:api-config\">+<flow name=\"get:\ping:$API_ARTIFACT_ID-config\">+" src/main/mule/api.xml) 
+          
+      - name: Update global.xml
+        run: |
+          API_ARTIFACT_ID=${{ github.event.inputs.raml-asset-id }}
+          RES=$(sed -i "s+flowRef=\"api-main\"+flowRef=\"$API_ARTIFACT_ID-main\"+" src/main/mule/common/global.xml)
+          
+      - name: Rename Mule configuration files...
+        run: |
+          API_ARTIFACT_ID=${{ github.event.inputs.raml-asset-id }}
+          RES=$(mv src/main/mule/api.xml src/main/mule/${API_ARTIFACT_ID}-api.xml)
+          RES=$(mv src/main/mule/implementation/api-impl.xml src/main/mule/implementation/${API_ARTIFACT_ID}-api-impl.xml)
           
