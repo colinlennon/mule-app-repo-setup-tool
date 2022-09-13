@@ -47,13 +47,13 @@ jobs:
                 "password": "${{ secrets.RELEASES_EE_PASSWORD }}"
             }]
           
-    - name: Cache local Maven repository
-      uses: actions/cache@v3
-      with:
-        path: ~/.m2/repository
-        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-        restore-keys: |
-          ${{ runner.os }}-maven-
+      - name: Cache local Maven repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
       
       # Checks-out this repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
