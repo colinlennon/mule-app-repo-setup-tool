@@ -1,0 +1,49 @@
+# This is a basic workflow to help you get started with Actions
+
+name: mule-app-repo-setup-tool
+
+on:
+  workflow_dispatch:
+    inputs:
+      group-id:
+        description: 'POM groupId'
+        type: string
+      artifact-id:
+        description: 'POM artifactId'
+        type: string
+      version:
+        description: 'POM version'
+        type: string
+      github-pat:
+        description: 'GitHub Personal Access Token'
+        type: string
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks-out this repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+      
+      # Checks-out the template under $GITHUB_WORKSPACE/template, so your job can access it
+      - uses: actions/checkout@v3
+        with:
+          repository: colinlennon/template-demo     <-- clone https://github.com/colinlennon/template-demo
+          ref: refs/heads/main
+          token: ${{ github.event.inputs.github-pat }}
+          path: ./template
+
+      # Runs a single command using the runners shell
+      - name: List in $GITHUB_WORKSPACE
+        run: ls -l
+        
+      # Runs a single command using the runners shell
+      - name: List in $GITHUB_WORKSPACE/template
+        run: ls -l ./template
+
+      # Runs a set of commands using the runners shell
+      - name: Run a multi-line script
+        run: |
+          echo Add other actions to build,
+          echo test, and deploy your project.
