@@ -29,7 +29,7 @@ jobs:
       # Checks-out the template under $GITHUB_WORKSPACE/template, so your job can access it
       - uses: actions/checkout@v3
         with:
-          repository: colinlennon/template-demo     <-- clone https://github.com/colinlennon/template-demo
+          repository: colinlennon/template-demo
           ref: main
           token: ${{ github.event.inputs.github-pat }}
           path: template
@@ -40,7 +40,7 @@ jobs:
         
       # Runs a single command using the runners shell
       - name: List in $GITHUB_WORKSPACE/template
-        run: ls -l ./template
+        run: ls -l template
 
       # Runs a set of commands using the runners shell
       - name: Run a multi-line script
