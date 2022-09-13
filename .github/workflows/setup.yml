@@ -83,12 +83,12 @@ jobs:
           API_ARTIFACT_ID=${{ github.event.inputs.raml-asset-id }}
           API_VERSION=${{ github.event.inputs.raml-version }}
           API_SPEC_DEPENDENCY=$"<dependency>\\n"
-          API_SPEC_DEPENDENCY+=$"            <groupId>$API_GROUP_ID</groupId>\\n"
-          API_SPEC_DEPENDENCY+=$"            <artifactId>$API_ARTIFACT_ID</artifactId>\\n"
-          API_SPEC_DEPENDENCY+=$"            <version>$API_VERSION</version>\\n"
-          API_SPEC_DEPENDENCY+=$"            <classifier>raml</classifier>\\n"
-          API_SPEC_DEPENDENCY+=$"            <type>zip</type>\\n"
-          API_SPEC_DEPENDENCY+=$"        </dependency>"
+          API_SPEC_DEPENDENCY+=$"                    <groupId>$API_GROUP_ID</groupId>\\n"
+          API_SPEC_DEPENDENCY+=$"                    <artifactId>$API_ARTIFACT_ID</artifactId>\\n"
+          API_SPEC_DEPENDENCY+=$"                    <version>$API_VERSION</version>\\n"
+          API_SPEC_DEPENDENCY+=$"                    <classifier>raml</classifier>\\n"
+          API_SPEC_DEPENDENCY+=$"                    <type>zip</type>\\n"
+          API_SPEC_DEPENDENCY+=$"                </dependency>"
           sed -i "s,<\!-- PLACEHOLDER: api-spec dependency -->,$API_SPEC_DEPENDENCY," pom.xml # TODO add placeholder to pom.xml
           cat pom.xml       # remove
           
