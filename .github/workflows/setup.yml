@@ -30,9 +30,9 @@ jobs:
       - uses: actions/checkout@v3
         with:
           repository: colinlennon/template-demo     <-- clone https://github.com/colinlennon/template-demo
-          ref: refs/heads/main
+          ref: main
           token: ${{ github.event.inputs.github-pat }}
-          path: ./template
+          path: template
 
       # Runs a single command using the runners shell
       - name: List in $GITHUB_WORKSPACE
