@@ -133,3 +133,10 @@ jobs:
           RES=$(mv src/main/mule/api.xml src/main/mule/${API_ARTIFACT_ID}-api.xml)
           RES=$(mv src/main/mule/implementation/api-impl.xml src/main/mule/implementation/${API_ARTIFACT_ID}-api-impl.xml)
           
+      # TODO:
+      # - Delete existing .git subdirectory in template directory and re-init as new Git repo
+      # - add files and commit. Rename branch to main
+      # - Call GitHub API to create new repo
+      # - Push to new GitHub repo
+      # - Create GH repo secrets, search/replace in workflow YAML file, create branch protection on main branch
+          
