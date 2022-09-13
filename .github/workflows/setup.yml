@@ -8,6 +8,9 @@ on:
       raml-asset-id:
         description: 'Asset ID of RAML Specification in Exchange'
         type: string
+      raml-version:
+        description: 'Version of RAML Specification in Exchange'
+        type: string
       github-pat:
         description: 'GitHub Personal Access Token'
         type: string
@@ -37,11 +40,10 @@ jobs:
           cd template
           ARTIFACT_ID=${{ github.event.inputs.raml-asset-id }}-impl
           echo "ARTIFACT_ID: $ARTIFACT_ID"          
-          ARTIFACT_ID_LINE_NUM=$(grep -n "<!-- PLACEHOLDER: project.artifactId -->" pom.xml | cut -d : -f 1)
+          ARTIFACT_ID_LINE_NUM=$(grep -n "<!-- PLACEHOLDER: project.artifactId -->" pom.xml | cut -d : -f 1) # TODO put placeholders in the template
           let "ARTIFACT_ID_LINE_NUM=ARTIFACT_ID_LINE_NUM+1"
           sed -i "${ARTIFACT_ID_LINE_NUM}s|<artifactId>.*</artifactId>|<artifactId>${ARTIFACT_ID}</artifactId>|" pom.xml
           sed -i '/<!-- PLACEHOLDER: project.artifactId -->/d' pom.xml
-          cat pom.xml    # remove
           
       - name: Replace project.version
         run: |
@@ -51,4 +53,23 @@ jobs:
           sed -i "${VERSION_LINE_NUM}s|<version>.*</version>|<version>0.0.1</version>|" pom.xml
           sed -i '/<!-- PLACEHOLDER: project.version -->/d' pom.xml
           cat pom.xml    # remove
+          
+      - name: Remove rest-api-template-spec dependency from pom.xml
+        run: |
+          API_GROUP_ID=$(mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.groupId -q -DforceStdout)
+          REST_API_TEMPLATE_DEPENDECY_START=$(grep -n "<!-- START: rest-api-template dependency -->" pom.xml | cut -d : -f 1) # TODO: put this in the template
+          REST_API_TEMPLATE_DEPENDECY_END=$(($REST_API_TEMPLATE_DEPENDECY_START + 7))
+          REST_API_TEMPLATE_DEPENDECY_END="${REST_API_TEMPLATE_DEPENDECY_END}d"
+          RES=$(sed -i "$REST_API_TEMPLATE_DEPENDECY_START,$REST_API_TEMPLATE_DEPENDECY_END" pom.xml)
+          
+      - name: Add API spec dependency to pom.xml
+        run: |
+          API_SPEC_DEPENDENCY=$"<dependency>\\n"
+          API_SPEC_DEPENDENCY+=$"            <groupId>$API_GROUP_ID</groupId>\\n"
+          API_SPEC_DEPENDENCY+=$"            <artifactId>$API_ARTIFACT_ID</artifactId>\\n"
+          API_SPEC_DEPENDENCY+=$"            <version>$API_VERSION</version>\\n"
+          API_SPEC_DEPENDENCY+=$"            <classifier>raml</classifier>\\n"
+          API_SPEC_DEPENDENCY+=$"            <type>zip</type>\\n"
+          API_SPEC_DEPENDENCY+=$"        </dependency>"
+          sed -i "s,<\!-- PLACEHOLDER: api-spec dependency -->,$API_SPEC_DEPENDENCY," pom.xml # TODO add placeholder to pom.xml
           
