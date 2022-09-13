@@ -37,7 +37,7 @@ jobs:
         with:
            servers: |
             [{
-                "id": "anypoint-exchange-v2",
+                "id": "anypoint-exchange-v3",
                 "username": "~~~Client~~~",
                 "password": "${{ secrets.EXCHANGE_CA_CLIENT_ID }}~?~${{ secrets.EXCHANGE_CA_CLIENT_SECRET }}"
             },
@@ -59,9 +59,10 @@ jobs:
       - uses: actions/checkout@v3
       
       # Checks-out the template under $GITHUB_WORKSPACE/template, so your job can access it
+      # Need to change repository identifier
       - uses: actions/checkout@v3
         with:
-          repository: colinlennon/template-demo
+          repository: colinlennon/mule4-rest-api-template
           ref: main
           token: ${{ github.event.inputs.github-pat }}
           path: template
