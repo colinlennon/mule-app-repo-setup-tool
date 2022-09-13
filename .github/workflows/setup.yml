@@ -20,6 +20,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Setup Java JDK
+        uses: actions/setup-java@v3.3.0
+        with:
+         distribution: 'temurin'
+         java-version: '11'
+       
+      - name: Set up Maven
+        uses: stCarolas/setup-maven@v4.3
+        with:
+          maven-version: 3.8.2
+      
       # Checks-out this repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
       
