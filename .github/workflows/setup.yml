@@ -5,14 +5,8 @@ name: mule-app-repo-setup-tool
 on:
   workflow_dispatch:
     inputs:
-      group-id:
-        description: 'POM groupId'
-        type: string
-      artifact-id:
-        description: 'POM artifactId'
-        type: string
-      version:
-        description: 'POM version'
+      raml-asset-id:
+        description: 'Asset ID of RAML Specification in Exchange'
         type: string
       github-pat:
         description: 'GitHub Personal Access Token'
@@ -33,22 +27,28 @@ jobs:
           ref: main
           token: ${{ github.event.inputs.github-pat }}
           path: template
-
-      # Runs a single command using the runners shell
-      - name: List in $GITHUB_WORKSPACE
-        run: ls -l
         
       # Runs a single command using the runners shell
-      - name: List in $GITHUB_WORKSPACE/template
-        run: ls -l template
+      - name: Switch to template directory
+        run: cd template
 
-      # Runs a set of commands using the runners shell
       - name: Replace project.artifactId
         run: |
+          ARTIFACT_ID=${{ github.event.inputs.raml-asset-id }}+"-impl"
+          echo "ARTIFACT_ID: $ARTIFACT_ID"
           cd template
           ARTIFACT_ID_LINE_NUM=$(grep -n "<!-- PLACEHOLDER: project.artifactId -->" pom.xml | cut -d : -f 1)
           let "ARTIFACT_ID_LINE_NUM=ARTIFACT_ID_LINE_NUM+1"
-          sed -i "${ARTIFACT_ID_LINE_NUM}s|<artifactId>.*</artifactId>|<artifactId>${{ github.event.inputs.artifact-id }}</artifactId>|" pom.xml
-          sed '|<!-- PLACEHOLDER: project.artifactId -->|d' pom.xml
+          sed -i "${ARTIFACT_ID_LINE_NUM}s|<artifactId>.*</artifactId>|<artifactId>${ARTIFACT_ID}</artifactId>|" pom.xml
+          sed -i '/<!-- PLACEHOLDER: project.artifactId -->/d' pom.xml
+          cat pom.xml       # remove
+          
+      - name: Replace project.version
+        run: |
+          cd template
+          VERSION_LINE_NUM=$(grep -n "<!-- PLACEHOLDER: project.version -->" pom.xml | cut -d : -f 1)
+          let "VERSION_LINE_NUM=VERSION_LINE_NUM+1"
+          sed -i "${VERSION_LINE_NUM}s|<version>.*</version>|<version>0.0.1</version>|" pom.xml
+          sed -i '/<!-- PLACEHOLDER: project.version -->/d' pom.xml
           cat pom.xml
           
