@@ -87,4 +87,5 @@ jobs:
           API_SPEC_DEPENDENCY+=$"            <type>zip</type>\\n"
           API_SPEC_DEPENDENCY+=$"        </dependency>"
           sed -i "s,<\!-- PLACEHOLDER: api-spec dependency -->,$API_SPEC_DEPENDENCY," pom.xml # TODO add placeholder to pom.xml
+          cat pom.xml       # remove
           
