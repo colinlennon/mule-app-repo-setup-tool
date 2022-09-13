@@ -30,6 +30,30 @@ jobs:
         uses: stCarolas/setup-maven@v4.3
         with:
           maven-version: 3.8.2
+        
+        # NOTE: server id should be anypoint-exchange-v3 for DTEF
+      - name: Setup Maven Settings
+        uses: s4u/maven-settings-action@v2.6.0
+        with:
+           servers: |
+            [{
+                "id": "anypoint-exchange-v2",
+                "username": "~~~Client~~~",
+                "password": "${{ secrets.EXCHANGE_CA_CLIENT_ID }}~?~${{ secrets.EXCHANGE_CA_CLIENT_SECRET }}"
+            },
+            {
+                "id": "mulesoft-releases-ee",
+                "username": "${{ secrets.RELEASES_EE_USERNAME }}",
+                "password": "${{ secrets.RELEASES_EE_PASSWORD }}"
+            }]
+          
+    - name: Cache local Maven repository
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
       
       # Checks-out this repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
