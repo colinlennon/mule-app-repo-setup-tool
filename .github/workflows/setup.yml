@@ -48,5 +48,5 @@ jobs:
           let "VERSION_LINE_NUM=VERSION_LINE_NUM+1"
           sed -i "${VERSION_LINE_NUM}s|<version>.*</version>|<version>0.0.1</version>|" pom.xml
           sed -i '/<!-- PLACEHOLDER: project.version -->/d' pom.xml
-          cat pom.xml.    # remove
+          cat pom.xml    # remove
           
