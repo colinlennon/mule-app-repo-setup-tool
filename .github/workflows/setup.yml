@@ -56,6 +56,7 @@ jobs:
           
       - name: Remove rest-api-template-spec dependency from pom.xml
         run: |
+          cd template
           API_GROUP_ID=$(mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.groupId -q -DforceStdout)
           REST_API_TEMPLATE_DEPENDECY_START=$(grep -n "<!-- START: rest-api-template dependency -->" pom.xml | cut -d : -f 1) # TODO: put this in the template
           REST_API_TEMPLATE_DEPENDECY_END=$(($REST_API_TEMPLATE_DEPENDECY_START + 7))
@@ -64,6 +65,7 @@ jobs:
           
       - name: Add API spec dependency to pom.xml
         run: |
+          cd template
           API_SPEC_DEPENDENCY=$"<dependency>\\n"
           API_SPEC_DEPENDENCY+=$"            <groupId>$API_GROUP_ID</groupId>\\n"
           API_SPEC_DEPENDENCY+=$"            <artifactId>$API_ARTIFACT_ID</artifactId>\\n"
