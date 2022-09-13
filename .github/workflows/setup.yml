@@ -108,6 +108,7 @@ jobs:
           
       - name: Update api.xml
         run: |
+          cd template
           API_ARTIFACT_ID=${{ github.event.inputs.raml-asset-id }}
           RES=$(sed -i "s+name=\"api-httpListenerConfig\"+name=\"$API_ARTIFACT_ID-httpListenerConfig\"+" src/main/mule/api.xml)
           RES=$(sed -i "s+<apikit:config name=\"api-config\"+<apikit:config name=\"$API_ARTIFACT_ID-config\"+" src/main/mule/api.xml)
@@ -120,11 +121,13 @@ jobs:
           
       - name: Update global.xml
         run: |
+          cd template
           API_ARTIFACT_ID=${{ github.event.inputs.raml-asset-id }}
           RES=$(sed -i "s+flowRef=\"api-main\"+flowRef=\"$API_ARTIFACT_ID-main\"+" src/main/mule/common/global.xml)
           
       - name: Rename Mule configuration files...
         run: |
+          cd template
           API_ARTIFACT_ID=${{ github.event.inputs.raml-asset-id }}
           RES=$(mv src/main/mule/api.xml src/main/mule/${API_ARTIFACT_ID}-api.xml)
           RES=$(mv src/main/mule/implementation/api-impl.xml src/main/mule/implementation/${API_ARTIFACT_ID}-api-impl.xml)
