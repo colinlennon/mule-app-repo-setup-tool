@@ -79,6 +79,9 @@ jobs:
       - name: Add API spec dependency to pom.xml
         run: |
           cd template
+          API_GROUP_ID=4662d833-1567-4253-b115-eb71a03c7051 # TODO get dynamically
+          API_ARTIFACT_ID={{ github.event.inputs.raml-asset-id }}
+          API_VERSION={{ github.event.inputs.raml-version }}
           API_SPEC_DEPENDENCY=$"<dependency>\\n"
           API_SPEC_DEPENDENCY+=$"            <groupId>$API_GROUP_ID</groupId>\\n"
           API_SPEC_DEPENDENCY+=$"            <artifactId>$API_ARTIFACT_ID</artifactId>\\n"
