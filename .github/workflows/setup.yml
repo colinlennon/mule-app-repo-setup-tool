@@ -34,9 +34,9 @@ jobs:
 
       - name: Replace project.artifactId
         run: |
-          ARTIFACT_ID=${{ github.event.inputs.raml-asset-id }}-impl
-          echo "ARTIFACT_ID: $ARTIFACT_ID"
           cd template
+          ARTIFACT_ID=${{ github.event.inputs.raml-asset-id }}-impl
+          echo "ARTIFACT_ID: $ARTIFACT_ID"          
           ARTIFACT_ID_LINE_NUM=$(grep -n "<!-- PLACEHOLDER: project.artifactId -->" pom.xml | cut -d : -f 1)
           let "ARTIFACT_ID_LINE_NUM=ARTIFACT_ID_LINE_NUM+1"
           sed -i "${ARTIFACT_ID_LINE_NUM}s|<artifactId>.*</artifactId>|<artifactId>${ARTIFACT_ID}</artifactId>|" pom.xml
@@ -45,8 +45,7 @@ jobs:
           
       - name: Replace project.version
         run: |
-          pwd
-          ls -l
+          cd template
           VERSION_LINE_NUM=$(grep -n "<!-- PLACEHOLDER: project.version -->" pom.xml | cut -d : -f 1)
           let "VERSION_LINE_NUM=VERSION_LINE_NUM+1"
           sed -i "${VERSION_LINE_NUM}s|<version>.*</version>|<version>0.0.1</version>|" pom.xml
