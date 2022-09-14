@@ -141,6 +141,8 @@ jobs:
           mv template $API_ARTIFACT_ID
           cd $API_ARTIFACT_ID
           rm -rf .git
+          git config --global user.email "clennon@mulesoft.com"   # Change for Bayer
+          git config --global user.name "Colin Lennon".           # Change for Bayer
           git init
           git add -A
           git commit -m "Initial commit (from mule-app-setup-script)"
