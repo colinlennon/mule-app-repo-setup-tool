@@ -161,7 +161,7 @@ jobs:
         with:
           source-directory: "$API_ARTIFACT_ID"
           destination-github-username: 'colinlennon'        # Change for Bayer
-          destination-repository-name: "$API_ARTIFACT_ID"
+          destination-repository-name: 'template-demo'
           user-email: clennon@mulesoft.com                  # Change for Bayer
           target-branch: main
         
