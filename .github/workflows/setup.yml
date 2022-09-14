@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     
     env:
-      API_TOKEN_GITHUB: ${{ github.event.inputs.github-pat }}
+      GH_TOKEN: ${{ github.event.inputs.github-pat }}
       API_ARTIFACT_ID: ${{ github.event.inputs.raml-asset-id }}
       API_VERSION: ${{ github.event.inputs.raml-version }}
       
@@ -156,6 +156,8 @@ jobs:
           
       - name: Push to new repository
         uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ github.event.inputs.github-pat }}
         with:
           source-directory: $API_ARTIFACT_ID
           destination-github-username: 'colinlennon'
