@@ -147,10 +147,10 @@ jobs:
           git add -A
           git commit -m "Initial commit (from mule-app-setup-script)"
           git branch -M main
-          #curl -X POST -H "Authorization: token $GITHUB_PAT" https://api.github.com/user/repos -d "{\"name\": \"$API_ARTIFACT_ID\"}"
-          #git remote add origin https://github.com/colinlennon/$API_ARTIFACT_ID.git    # Will need to update org name for Bayer
+          #curl -X POST -H "Authorization: token $GITHUB_PAT" https://api.github.com/user/repos -d "{\"name\": \"$API_ARTIFACT_ID\"}"          
           #git push -u origin main     
-          gh repo create $API_ARTIFACT_ID --public --source=.   # visibility should be internal for Bayer, not public. Name should be in org/name format.
+          gh repo create $API_ARTIFACT_ID --public    # visibility should be internal for Bayer, not public. Name should be in org/name format.
+          git remote add origin https://github.com/colinlennon/$API_ARTIFACT_ID.git    # Will need to update org name for Bayer
           git config --unset-all http.https://github.com/.extraheader
           git push -u origin main --prune https://token:$GITHUB_PAT@github.com/colinlennon/$API_ARTIFACT_ID.git
         
@@ -159,4 +159,5 @@ jobs:
       # - create repo environments
       # - create GH repo secrets
       # - create branch protection on main branch
+      # - consider storing GitHub PAT as repo secret
           
