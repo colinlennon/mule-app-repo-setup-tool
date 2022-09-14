@@ -151,7 +151,8 @@ jobs:
           #git remote add origin https://github.com/colinlennon/$API_ARTIFACT_ID.git    # Will need to update org name for Bayer
           #git push -u origin main     
           gh repo create $API_ARTIFACT_ID --public --source=.   # visibility should be internal for Bayer, not public. Name should be in org/name format.
-          git push -u origin main 
+          git config --unset-all http.https://github.com/.extraheader
+          git push -u origin main --prune https://token:$GITHUB_PAT@github.com/colinlennon/$API_ARTIFACT_ID.git
         
       # TODO:
       # - search/replace in workflow YAML file (before creating repo)
