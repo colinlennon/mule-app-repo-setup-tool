@@ -157,17 +157,18 @@ jobs:
         run: |
           cd template
           rm -rf .git
-          git config --global user.email "clennon@mulesoft.com"   # Change for Bayer
-          git config --global user.name "Colin Lennon".           # Change for Bayer
-          git init
-          git add -A
-          git commit -m "Initial commit from mule-app-setup-script"
-          git branch -M main
+          #git config --global user.email "clennon@mulesoft.com"   # Change for Bayer
+          #git config --global user.name "Colin Lennon".           # Change for Bayer
+          #git init          
           cd ..
           cp -a ./template/. ./repo/
           cd repo
+          git add -A
+          git commit -m "Initial commit from mule-app-setup-script"
+          git branch -M main
+          git remote add origin https://github.com/colinlennon/$API_ARTIFACT_ID.git
           echo "Pushing to new repo..."
-          git push
+          git push -u origin main
       
       #- name: Push to new repository
       #  uses: cpina/github-action-push-to-another-repository@main
