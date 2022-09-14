@@ -159,7 +159,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: colinlennon/$API_ARTIFACT_ID     # Will need to update org name for Bayer
-          token: $GH_TOKEN
+          token: ${{ github.event.inputs.github-pat }}
           path: 'repo'
       
       #- name: Push to new repository
