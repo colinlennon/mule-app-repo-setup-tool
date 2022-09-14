@@ -163,6 +163,8 @@ jobs:
           cd ..
           cp -a ./template/. ./repo/
           cd repo
+          git config --global user.email "clennon@mulesoft.com"   # Change for Bayer
+          git config --global user.name "Colin Lennon".           # Change for Bayer
           git add -A
           git commit -m "Initial commit from mule-app-setup-script"
           git branch -M main
