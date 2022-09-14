@@ -137,16 +137,7 @@ jobs:
           RES=$(mv src/main/mule/implementation/api-impl.xml src/main/mule/implementation/${API_ARTIFACT_ID}-api-impl.xml)
           
       - name: Create new repo
-        run: |
-          mv template $API_ARTIFACT_ID
-          cd $API_ARTIFACT_ID
-          rm -rf .git
-          git config --global user.email "clennon@mulesoft.com"   # Change for Bayer
-          git config --global user.name "Colin Lennon".           # Change for Bayer
-          git init
-          git add -A
-          git commit -m "Initial commit (from mule-app-setup-script)"
-          git branch -M main
+        run: |          
           curl -X POST -H "Authorization: token $GH_TOKEN" https://api.github.com/user/repos -d "{\"name\": \"$API_ARTIFACT_ID\", \"auto_init\": true}"     
           #gh repo create $API_ARTIFACT_ID --public  # visibility should be internal for Bayer, not public. Name should be in org/name format.
           #gh api --method POST -H "Accept: application/vnd.github.v3+json" /repos/colinlennon/$API_ARTIFACT_ID/git/refs -f ref='refs/heads/main'
@@ -161,6 +152,22 @@ jobs:
           repository: colinlennon/${{ github.event.inputs.raml-asset-id }}     # Will need to update org name for Bayer
           token: ${{ github.event.inputs.github-pat }}
           path: 'repo'
+          
+      - name: Push to new repo
+        run: |
+          cd template
+          rm -rf .git
+          git config --global user.email "clennon@mulesoft.com"   # Change for Bayer
+          git config --global user.name "Colin Lennon".           # Change for Bayer
+          git init
+          git add -A
+          git commit -m "Initial commit from mule-app-setup-script"
+          git branch -M main
+          cd ..
+          cp -a /template/. /repo/
+          cd repo
+          echo "Pushing to new repo..."
+          git push
       
       #- name: Push to new repository
       #  uses: cpina/github-action-push-to-another-repository@main
