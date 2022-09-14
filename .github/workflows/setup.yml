@@ -18,6 +18,12 @@ on:
 jobs:
   setup:
     runs-on: ubuntu-latest
+    
+    env:
+      GH_TOKEN: ${{ github.event.inputs.github-pat }}
+      API_ARTIFACT_ID: ${{ github.event.inputs.raml-asset-id }}
+      API_VERSION: ${{ github.event.inputs.raml-version }}
+      
 
     steps:
       - name: Setup Java JDK
@@ -71,7 +77,7 @@ jobs:
         run: |
           cd template
           echo "Replacing project.artifactId..."
-          ARTIFACT_ID=${{ github.event.inputs.raml-asset-id }}-impl
+          ARTIFACT_ID=$API_ARTIFACT_ID-impl
           echo "ARTIFACT_ID: $ARTIFACT_ID"          
           ARTIFACT_ID_LINE_NUM=$(grep -n "<!-- PLACEHOLDER: project.artifactId -->" pom.xml | cut -d : -f 1) # TODO put placeholders in the template
           let "ARTIFACT_ID_LINE_NUM=ARTIFACT_ID_LINE_NUM+1"
@@ -96,7 +102,7 @@ jobs:
           echo "Adding API spec dependency..."
           API_GROUP_ID=4662d833-1567-4253-b115-eb71a03c7051 # TODO get dynamically
           API_ARTIFACT_ID=${{ github.event.inputs.raml-asset-id }}
-          API_VERSION=${{ github.event.inputs.raml-version }}
+          
           API_SPEC_DEPENDENCY=$"<dependency>\\n"
           API_SPEC_DEPENDENCY+=$"                    <groupId>$API_GROUP_ID</groupId>\\n"
           API_SPEC_DEPENDENCY+=$"                    <artifactId>$API_ARTIFACT_ID</artifactId>\\n"
@@ -110,7 +116,6 @@ jobs:
       - name: Update api.xml
         run: |
           cd template
-          API_ARTIFACT_ID=${{ github.event.inputs.raml-asset-id }}
           RES=$(sed -i "s+name=\"api-httpListenerConfig\"+name=\"$API_ARTIFACT_ID-httpListenerConfig\"+" src/main/mule/api.xml)
           RES=$(sed -i "s+<apikit:config name=\"api-config\"+<apikit:config name=\"$API_ARTIFACT_ID-config\"+" src/main/mule/api.xml)
           #	- Search for and replace: api="resource::9603fc66-9985-4754-8a84-6dfcfc3b2d72:rest-api-template-spec:1.0.1:raml:zip:api.raml" (note: will need to update this for Bayer template)
@@ -123,20 +128,16 @@ jobs:
       - name: Update global.xml
         run: |
           cd template
-          API_ARTIFACT_ID=${{ github.event.inputs.raml-asset-id }}
           RES=$(sed -i "s+flowRef=\"api-main\"+flowRef=\"$API_ARTIFACT_ID-main\"+" src/main/mule/common/global.xml)
           
       - name: Rename Mule configuration files
         run: |
           cd template
-          API_ARTIFACT_ID=${{ github.event.inputs.raml-asset-id }}
           RES=$(mv src/main/mule/api.xml src/main/mule/${API_ARTIFACT_ID}-api.xml)
           RES=$(mv src/main/mule/implementation/api-impl.xml src/main/mule/implementation/${API_ARTIFACT_ID}-api-impl.xml)
           
       - name: Create new repo
         run: |
-          API_ARTIFACT_ID=${{ github.event.inputs.raml-asset-id }}
-          GH_TOKEN=${{ github.event.inputs.github-pat }}
           mv template $API_ARTIFACT_ID
           rm -rf $API_ARTIFACT_ID/.git
           #git init
