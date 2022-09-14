@@ -136,7 +136,7 @@ jobs:
       - name: Create new repo
         run: |
           API_ARTIFACT_ID=${{ github.event.inputs.raml-asset-id }}
-          GITHUB_TOKEN=${{ github.event.inputs.github-pat }}
+          GH_TOKEN=${{ github.event.inputs.github-pat }}
           mv template $API_ARTIFACT_ID
           rm -rf $API_ARTIFACT_ID/.git
           #git init
