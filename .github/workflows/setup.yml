@@ -136,17 +136,17 @@ jobs:
       - name: Create new repo
         run: |
           API_ARTIFACT_ID=${{ github.event.inputs.raml-asset-id }}
-          GITHUB_PAT=${{ github.event.inputs.github-pat }}
+          GITHUB_TOKEN=${{ github.event.inputs.github-pat }}
           mv template $API_ARTIFACT_ID
-          cd $API_ARTIFACT_ID
-          rm -rf .git
-          git init
-          git add -A
-          git commit -m "Initial commit (from mule-app-setup-script)"
-          git branch -M main
-          curl -X POST -H "Authorization: token $GITHUB_PAT" https://api.github.com/user/repos -d "{\"name\": \"$API_ARTIFACT_ID\"}"
-          git remote add origin https://github.com/colinlennon/$API_ARTIFACT_ID.git    # Will need to update org name for Bayer
-          git push -u origin main        
+          rm -rf $API_ARTIFACT_ID/.git
+          #git init
+          #git add -A
+          #git commit -m "Initial commit (from mule-app-setup-script)"
+          #git branch -M main
+          #curl -X POST -H "Authorization: token $GITHUB_PAT" https://api.github.com/user/repos -d "{\"name\": \"$API_ARTIFACT_ID\"}"
+          #git remote add origin https://github.com/colinlennon/$API_ARTIFACT_ID.git    # Will need to update org name for Bayer
+          #git push -u origin main     
+          gh repo create $API_ARTIFACT_ID --source $API_ARTIFACT_ID
         
       # TODO:
       # - search/replace in workflow YAML file (before creating repo)
