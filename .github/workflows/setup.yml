@@ -164,7 +164,7 @@ jobs:
           git commit -m "Initial commit from mule-app-setup-script"
           git branch -M main
           cd ..
-          cp -a /template/. /repo/
+          cp -a ./template/. ./repo/
           cd repo
           echo "Pushing to new repo..."
           git push
