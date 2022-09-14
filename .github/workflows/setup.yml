@@ -141,30 +141,30 @@ jobs:
           mv template $API_ARTIFACT_ID
           cd $API_ARTIFACT_ID
           rm -rf .git
-          #git config --global user.email "clennon@mulesoft.com"   # Change for Bayer
-          #git config --global user.name "Colin Lennon".           # Change for Bayer
-          #git init
-          #git add -A
-          #git commit -m "Initial commit (from mule-app-setup-script)"
-          #git branch -M main
+          git config --global user.email "clennon@mulesoft.com"   # Change for Bayer
+          git config --global user.name "Colin Lennon".           # Change for Bayer
+          git init
+          git add -A
+          git commit -m "Initial commit (from mule-app-setup-script)"
+          git branch -M main
           #curl -X POST -H "Authorization: token $GITHUB_PAT" https://api.github.com/user/repos -d "{\"name\": \"$API_ARTIFACT_ID\"}"     
-          gh repo create $API_ARTIFACT_ID --public    # visibility should be internal for Bayer, not public. Name should be in org/name format.
-          gh api --method POST -H "Accept: application/vnd.github.v3+json" /repos/colinlennon/$API_ARTIFACT_ID/git/refs -f ref='refs/heads/main'
+          gh repo create $API_ARTIFACT_ID --public --source=. --push   # visibility should be internal for Bayer, not public. Name should be in org/name format.
+          #gh api --method POST -H "Accept: application/vnd.github.v3+json" /repos/colinlennon/$API_ARTIFACT_ID/git/refs -f ref='refs/heads/main'
           #echo "Adding remote..."
           #git remote add origin https://github.com/colinlennon/$API_ARTIFACT_ID.git    # Will need to update org name for Bayer
           #echo "Pushing to GitHub..."
           #git push -u origin main https://$GH_TOKEN@github.com/colinlennon/$API_ARTIFACT_ID.git +refs/remotes/origin/*:refs/heads/* +refs/tags/*:refs/tags/*
           
-      - name: Push to new repository
-        uses: cpina/github-action-push-to-another-repository@main
-        env:
-          API_TOKEN_GITHUB: ${{ github.event.inputs.github-pat }}
-        with:
-          source-directory: "$API_ARTIFACT_ID"
-          destination-github-username: 'colinlennon'        # Change for Bayer
-          destination-repository-name: 'template-demo'
-          user-email: clennon@mulesoft.com                  # Change for Bayer
-          target-branch: main
+      #- name: Push to new repository
+      #  uses: cpina/github-action-push-to-another-repository@main
+      #  env:
+      #    API_TOKEN_GITHUB: ${{ github.event.inputs.github-pat }}
+      #  with:
+      #    source-directory: "$API_ARTIFACT_ID"
+      #    destination-github-username: 'colinlennon'        # Change for Bayer
+      #    destination-repository-name: 'template-demo'
+      #    user-email: clennon@mulesoft.com                  # Change for Bayer
+      #    target-branch: main
         
       # TODO:
       # - search/replace in workflow YAML file (before creating repo)
