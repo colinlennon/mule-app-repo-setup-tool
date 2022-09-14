@@ -158,7 +158,7 @@ jobs:
       - name: Checkout new repo
         uses: actions/checkout@v3
         with:
-          repository: colinlennon/$API_ARTIFACT_ID     # Will need to update org name for Bayer
+          repository: colinlennon/${API_ARTIFACT_ID}     # Will need to update org name for Bayer
           token: ${{ github.event.inputs.github-pat }}
           path: 'repo'
       
