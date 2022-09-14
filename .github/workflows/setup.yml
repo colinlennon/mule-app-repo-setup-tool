@@ -150,7 +150,7 @@ jobs:
           #curl -X POST -H "Authorization: token $GITHUB_PAT" https://api.github.com/user/repos -d "{\"name\": \"$API_ARTIFACT_ID\"}"
           #git remote add origin https://github.com/colinlennon/$API_ARTIFACT_ID.git    # Will need to update org name for Bayer
           #git push -u origin main     
-          gh repo create $API_ARTIFACT_ID --internal --source .
+          gh repo create $API_ARTIFACT_ID --public --source .   # visibility should be internal for Bayer, not public
         
       # TODO:
       # - search/replace in workflow YAML file (before creating repo)
