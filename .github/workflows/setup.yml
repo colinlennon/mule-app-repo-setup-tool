@@ -126,17 +126,31 @@ jobs:
           API_ARTIFACT_ID=${{ github.event.inputs.raml-asset-id }}
           RES=$(sed -i "s+flowRef=\"api-main\"+flowRef=\"$API_ARTIFACT_ID-main\"+" src/main/mule/common/global.xml)
           
-      - name: Rename Mule configuration files...
+      - name: Rename Mule configuration files
         run: |
           cd template
           API_ARTIFACT_ID=${{ github.event.inputs.raml-asset-id }}
           RES=$(mv src/main/mule/api.xml src/main/mule/${API_ARTIFACT_ID}-api.xml)
           RES=$(mv src/main/mule/implementation/api-impl.xml src/main/mule/implementation/${API_ARTIFACT_ID}-api-impl.xml)
           
+      - name: Create new repo
+        run: |
+          API_ARTIFACT_ID=${{ github.event.inputs.raml-asset-id }}
+          GITHUB_PAT=${{ github.event.inputs.github-pat }}
+          mv template $API_ARTIFACT_ID
+          cd $API_ARTIFACT_ID
+          rm -rf .git
+          git init
+          git add -A
+          git commit -m "Initial commit (from mule-app-setup-script)"
+          git branch -M main
+          curl -X POST -H "Authorization: token $GITHUB_PAT" https://api.github.com/user/repos -d "{\"name\": \"$API_ARTIFACT_ID\"}"
+          git remote add origin https://github.com/colinlennon/$API_ARTIFACT_ID.git    # Will need to update org name for Bayer
+          git push -u origin main        
+        
       # TODO:
-      # - Delete existing .git subdirectory in template directory and re-init as new Git repo
-      # - add files and commit. Rename branch to main
-      # - Call GitHub API to create new repo
-      # - Push to new GitHub repo
-      # - Create GH repo secrets, search/replace in workflow YAML file, create branch protection on main branch
+      # - search/replace in workflow YAML file (before creating repo)
+      # - create repo environments
+      # - create GH repo secrets
+      # - create branch protection on main branch
           
