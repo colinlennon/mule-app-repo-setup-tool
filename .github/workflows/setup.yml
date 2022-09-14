@@ -159,10 +159,10 @@ jobs:
         env:
           API_TOKEN_GITHUB: ${{ github.event.inputs.github-pat }}
         with:
-          source-directory: $API_ARTIFACT_ID
-          destination-github-username: 'colinlennon'
-          destination-repository-name: $API_ARTIFACT_ID
-          user-email: clennon@mulesoft.com
+          source-directory: "$API_ARTIFACT_ID"
+          destination-github-username: 'colinlennon'        # Change for Bayer
+          destination-repository-name: "$API_ARTIFACT_ID"
+          user-email: clennon@mulesoft.com                  # Change for Bayer
           target-branch: main
         
       # TODO:
