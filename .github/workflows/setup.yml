@@ -152,7 +152,7 @@ jobs:
           echo "Adding remote..."
           git remote add origin https://github.com/colinlennon/$API_ARTIFACT_ID.git    # Will need to update org name for Bayer
           echo "Pushing to GitHub..."
-          git push -u origin main https://$GH_TOKEN@github.com/colinlennon/$API_ARTIFACT_ID.git HEAD:main
+          git push -u origin main https://$GH_TOKEN@github.com/colinlennon/$API_ARTIFACT_ID.git +refs/remotes/origin/*:refs/heads/* +refs/tags/*:refs/tags/*
         
       # TODO:
       # - search/replace in workflow YAML file (before creating repo)
