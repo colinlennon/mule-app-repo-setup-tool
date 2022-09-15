@@ -67,7 +67,7 @@ jobs:
       # Checks-out the template repo under $GITHUB_WORKSPACE/template, so your job can access it      
       - uses: actions/checkout@v3
         with:
-          repository: colinlennon/mule4-rest-api-template.  # Need to change repository identifier for Bayer
+          repository: colinlennon/mule4-rest-api-template  # Need to change repository identifier for Bayer
           ref: main
           token: ${{ secrets.GH_TOKEN }}
           path: template
