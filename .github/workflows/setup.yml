@@ -22,53 +22,55 @@ jobs:
     env:
       GH_TOKEN: ${{ github.event.inputs.github-pat }}
       API_ARTIFACT_ID: ${{ github.event.inputs.raml-asset-id }}
-      API_VERSION: ${{ github.event.inputs.raml-version }}
+      API_VERSION: ${{ github.event.inputs.raml-version }}    
       
+      # NOTE: these two properties relate to the API spec for the Mule app template. These will need to be updated if/when the spec is changed.
+      TEMPLATE_API_SPEC_ASSET_ID: 'rest-api-template-spec'
+      TEMPLATE_API_SPEC_VERSION: '1.0.0'
 
     steps:
-      - name: Setup Java JDK
-        uses: actions/setup-java@v3.3.0
-        with:
-         distribution: 'temurin'
-         java-version: '11'
+      #- name: Setup Java JDK
+      #  uses: actions/setup-java@v3.3.0
+      #  with:
+      #   distribution: 'temurin'
+      #   java-version: '11'
        
-      - name: Set up Maven
-        uses: stCarolas/setup-maven@v4.3
-        with:
-          maven-version: 3.8.2
+      #- name: Set up Maven
+      #  uses: stCarolas/setup-maven@v4.3
+      #  with:
+      #    maven-version: 3.8.2
         
         # NOTE: server id should be anypoint-exchange-v3 for DTEF
-      - name: Setup Maven Settings
-        uses: s4u/maven-settings-action@v2.6.0
-        with:
-           servers: |
-            [{
-                "id": "anypoint-exchange-v3",
-                "username": "~~~Client~~~",
-                "password": "${{ secrets.EXCHANGE_CA_CLIENT_ID }}~?~${{ secrets.EXCHANGE_CA_CLIENT_SECRET }}"
-            },
-            {
-                "id": "mulesoft-releases-ee",
-                "username": "${{ secrets.RELEASES_EE_USERNAME }}",
-                "password": "${{ secrets.RELEASES_EE_PASSWORD }}"
-            }]
+      #- name: Setup Maven Settings
+      #  uses: s4u/maven-settings-action@v2.6.0
+      #  with:
+      #     servers: |
+      #      [{
+      #          "id": "anypoint-exchange-v3",
+      #          "username": "~~~Client~~~",
+      #          "password": "${{ secrets.EXCHANGE_CA_CLIENT_ID }}~?~${{ secrets.EXCHANGE_CA_CLIENT_SECRET }}"
+      #      },
+      #      {
+      #          "id": "mulesoft-releases-ee",
+      #          "username": "${{ secrets.RELEASES_EE_USERNAME }}",
+      #          "password": "${{ secrets.RELEASES_EE_PASSWORD }}"
+      #      }]
           
-      - name: Cache local Maven repository
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
+      #- name: Cache local Maven repository
+      #  uses: actions/cache@v3
+      #  with:
+      #    path: ~/.m2/repository
+      #    key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+      #    restore-keys: |
+      #      ${{ runner.os }}-maven-
       
       # Checks-out this repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
       
-      # Checks-out the template under $GITHUB_WORKSPACE/template, so your job can access it
-      # Need to change repository identifier
+      # Checks-out the template repo under $GITHUB_WORKSPACE/template, so your job can access it      
       - uses: actions/checkout@v3
         with:
-          repository: colinlennon/mule4-rest-api-template
+          repository: colinlennon/mule4-rest-api-template.  # Need to change repository identifier for Bayer
           ref: main
           token: ${{ github.event.inputs.github-pat }}
           path: template
@@ -92,8 +94,11 @@ jobs:
 
           echo "Removing rest-api-template-spec dependency..."
           API_GROUP_ID=4662d833-1567-4253-b115-eb71a03c7051
-          # TODO: get API_GROUP_ID dynamically using line below. Maven settings need to be configured for this to work.
+          
+          # NOTE: you could get API_GROUP_ID dynamically using line below. Java, Maven and Maven settings need to be configured for this to work.
+          # This could be useful if/when using this tool for other workspaces/templates beyond EF Intermediate.
           #API_GROUP_ID=$(mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.groupId -q -DforceStdout)
+          
           REST_API_TEMPLATE_DEPENDECY_START=$(grep -n "<!-- START: rest-api-template dependency -->" pom.xml | cut -d : -f 1) # TODO: put this in the template
           REST_API_TEMPLATE_DEPENDECY_END=$(($REST_API_TEMPLATE_DEPENDECY_START + 7))
           REST_API_TEMPLATE_DEPENDECY_END="${REST_API_TEMPLATE_DEPENDECY_END}d"
@@ -118,8 +123,7 @@ jobs:
           cd template
           RES=$(sed -i "s+name=\"api-httpListenerConfig\"+name=\"$API_ARTIFACT_ID-httpListenerConfig\"+" src/main/mule/api.xml)
           RES=$(sed -i "s+<apikit:config name=\"api-config\"+<apikit:config name=\"$API_ARTIFACT_ID-config\"+" src/main/mule/api.xml)
-          #	- Search for and replace: api="resource::9603fc66-9985-4754-8a84-6dfcfc3b2d72:rest-api-template-spec:1.0.1:raml:zip:api.raml" (note: will need to update this for Bayer template)
-          RES=$(sed -i "s+api=\"resource::4662d833-1567-4253-b115-eb71a03c7051:rest-api-template-spec:1.0.0:raml:zip:api.raml\"+api=\"resource::$API_GROUP_ID:$API_ARTIFACT_ID:$API_VERSION:raml:zip:$API_ARTIFACT_ID.raml\"+" src/main/mule/api.xml)
+          RES=$(sed -i "s+api=\"resource::$API_GROUP_ID:$TEMPLATE_API_SPEC_ASSET_ID:$TEMPLATE_API_SPEC_VERSION:raml:zip:api.raml\"+api=\"resource::$API_GROUP_ID:$API_ARTIFACT_ID:$API_VERSION:raml:zip:$API_ARTIFACT_ID.raml\"+" src/main/mule/api.xml)
           RES=$(sed -i "s+<http:listener config-ref=\"api-httpListenerConfig\"+<http:listener config-ref=\"$API_ARTIFACT_ID-httpListenerConfig\"+" src/main/mule/api.xml)
           RES=$(sed -i "s+<apikit:router config-ref=\"api-config\"+<apikit:router config-ref=\"$API_ARTIFACT_ID-config\"+" src/main/mule/api.xml)
           RES=$(sed -i "s+<flow name=\"api-main\">+<flow name=\"$API_ARTIFACT_ID-main\">+" src/main/mule/api.xml)
@@ -139,13 +143,7 @@ jobs:
       - name: Create new repo
         run: |          
           curl -X POST -H "Authorization: token $GH_TOKEN" https://api.github.com/user/repos -d "{\"name\": \"$API_ARTIFACT_ID\", \"auto_init\": true}"     
-          #gh repo create $API_ARTIFACT_ID --public  # visibility should be internal for Bayer, not public. Name should be in org/name format.
-          #gh api --method POST -H "Accept: application/vnd.github.v3+json" /repos/colinlennon/$API_ARTIFACT_ID/git/refs -f ref='refs/heads/main'
-          #echo "Adding remote..."
-          #git remote add origin https://github.com/colinlennon/$API_ARTIFACT_ID.git    # Will need to update org name for Bayer
-          #echo "Pushing to GitHub..."
-          #git push -u origin main https://$GH_TOKEN@github.com/colinlennon/$API_ARTIFACT_ID.git +refs/remotes/origin/*:refs/heads/* +refs/tags/*:refs/tags/*
-          
+                    
       - name: Checkout new repo
         uses: actions/checkout@v3
         with:
@@ -156,19 +154,15 @@ jobs:
       - name: Push to new repo
         run: |
           cd template
-          rm -rf .git
-          #git config --global user.email "clennon@mulesoft.com"   # Change for Bayer
-          #git config --global user.name "Colin Lennon".           # Change for Bayer
-          #git init          
+          rm -rf .git                 
           cd ..
           cp -a ./template/. ./repo/
           cd repo
-          git config --global user.email "clennon@mulesoft.com"   # Change for Bayer
-          git config --global user.name "Colin Lennon".           # Change for Bayer
+          git config --global user.email "nobody@bayer.com"   # Change for Bayer
+          git config --global user.name "GitHub Actions"      # Change for Bayer
           git add -A
           git commit -m "Initial commit from mule-app-setup-script"
-          git branch -M main
-          #git remote add origin https://github.com/colinlennon/$API_ARTIFACT_ID.git
+          git branch -M main          
           echo "Pushing to new repo..."
           git push -u origin main
       
