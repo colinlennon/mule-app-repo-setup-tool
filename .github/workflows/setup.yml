@@ -11,6 +11,9 @@ on:
       raml-version:
         description: 'Version of RAML Specification in Exchange'
         type: string
+      ap-client-id-nonprod:
+        description: 'Client ID of the NonProd environment'     # To be replaced with calls to Credentials API
+        type: string
 
 jobs:
   setup:
@@ -142,6 +145,7 @@ jobs:
           curl -X POST -H "Authorization: token $GH_TOKEN" https://api.github.com/user/repos -d "{\"name\": \"$API_ARTIFACT_ID\", \"auto_init\": true}"
           curl -X PUT -H "Authorization: token $GH_TOKEN" https://api.github.com/repos/colinlennon/${API_ARTIFACT_ID}/environments/NonProd  # Change org name
           curl -X PUT -H "Authorization: token $GH_TOKEN" https://api.github.com/repos/colinlennon/${API_ARTIFACT_ID}/environments/Prod     # Change org name
+          gh secret set AP_CLIENT_ID -b "${{ github.event.inputs.ap-client-id-nonprod }}" -e NonProd -R colinlennon/${API_ARTIFACT_ID}        # Change org name
                     
       - name: Checkout new repo
         uses: actions/checkout@v3
